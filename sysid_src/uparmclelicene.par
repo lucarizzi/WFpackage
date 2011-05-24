@@ -1,0 +1,6 @@
+user,s,a,"held",,,"User name"
+machine,s,a,"heldp",,,"Machine name"
+year,r,a,2099.,,,"Expiration year"
+month,r,a,12.,,,"Expiration month (two digit!)"
+day,r,a,31.,,,"Expiration day"
+mode,s,h,"ql",,,

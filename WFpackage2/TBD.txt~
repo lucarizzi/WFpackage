@@ -1,0 +1,14 @@
+
+- ereditare la dipendenza dall'instrument file da un unico setup iniziale, 
+  ad esempio 'wfpsetup'
+
+- implementare il concetto di CAMERA in wfpsetup come wrapper per il 
+  setup iniziale dei vari strumenti (attualmente solo WFI)
+
+- as esempio in wfpzero, ereditare il nome dell'instrument file
+
+- aggiungere la scelta del punto tangente in WFPCOMB
+
+- comando per ritagliare i files alla stessa misura fisica
+
+- 

@@ -1,0 +1,50 @@
+.help wfpcenter Mar2000 wfpdred
+.ih
+NAME
+wfpcenter --- Center stars on mosaic exposures.
+.ih
+USAGE
+wfpcenter image inname outname
+.ih
+PARAMETERS
+.ls image
+Image with stars to be centered.
+.le
+.ls inname
+Input catalog of stars.
+.le
+.ls outname
+Output centered catalog
+.le
+.ls columns
+Columns containing the celestial (WCS) coordinates of the stars.
+.le
+.ls colmag
+This parameter is used to preserve at least one column of the input file. All the other columns are lost
+during the centering process. Of course, this columns does not need to be the magnitude column. When
+the task wfpcenter is called by the task wfpastro to compute the astrometric solution, this parameter is 
+automatically set to the catalog columns containing the star ID.
+.le
+.ls inunits
+Input units (hours, degree)
+.le
+.ls outunits
+Output units
+.le
+
+.ih
+DESCRIPTION
+This task is used to center stars on mosaic exposures. It accepts catalogs in different formats but requires
+at least two columns containing the wcs coordinates of the stars. The output catalogs can be generated in 
+two formats: the first (astro=no) contains only the centered coordinates and the optional third column.
+In astro=yes mode, the output catalog is in logical coordinates and contains a number identifying the ccd.
+This second output is used by the task wfpastro to compute the astrometric solution.
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+
+.ih
+VERSION
+L.Rizzi, 1 Jul 2000.
+.endhelp

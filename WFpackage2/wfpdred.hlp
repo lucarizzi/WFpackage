@@ -1,0 +1,23 @@
+.help wfpdred Feb2000 wfpdred
+.ih
+WIDE FIELD PADOVA REDUCTION PACKAGE
+.ih
+\fRThis package has been developed by the Padova Astronomical Observatory \fR
+.ih 
+AVAIABLE TASKS:
+.ls wfpdcat
+Search the USNO catalog (ESO) to generate star lists.
+.le
+.ls wfpdzero
+Find and apply offsets and small rotations / scale changes between astrometric
+calibration and images
+.le
+.ih 
+VERSION
+This is only a test version. Please refer to Luca Rizzi for information and bugs.
+.ih
+
+Padova, 17 Mar 2000.
+Luca Rizzi
+rizzi@pd.astro.it
+.endhelp

@@ -1,0 +1,77 @@
+.help wfpcat Feb2000 wfpdred
+.ih
+NAME
+wfpdcat -- search via WEB the USNO catalog (ESO) to obtain star
+position catalogs.
+.ih
+USAGE
+wfpdcat image1, image2,... cat1, cat2,..
+.ih
+PARAMETERS
+.ls image
+Images for which star catalogs are needed.
+.le
+.ls names
+Names of corresponding catalogs. You need to specify one catalog for each image. If you set this parameter to \fBdefault\fR, a template name will be produced in the form \fBimage_root_name.cat\fR, which is the same default used in the task wfpdzero.
+.le
+.ls maxob
+Maximum number of objects in catalogs. If you set this option to a
+value smaller than the USNO stars in the field, the faintest stars will be
+eliminated.
+.le
+.ls radius
+Maximum distance of an object from the header coordinates of the
+center of the field.
+.le
+
+
+.ih
+DESCRIPTION
+This task is used to produce star catalogs for the task
+\fBwfpdzero\fR. For each image on the input list, the image header
+keywords \fBRA\fR and \fBDEC\fR are read and the USNO catalog is
+searched for. The maximun number of stars for each catalog is set by the
+parameter \fBmaxob\fR while the maximum search radius is determined by 
+the parameter \fBradius\fR. If the USNO catalog contains more stars
+than required, only the brightest will be included in the output
+catalog. The name of the output catalog may be specified in two ways:
+either you provide a valid catalog name for each image, or you set the 
+\fBname\fR parameter to "default". In this case, a catalog name will
+be produced in the form ima0001.cat for image ima0001.fits. The
+catalog name is written on the image header in the keyword \fBCATALOG\fR
+of the extension "0". 
+.ih
+EXAMPLES
+1. If you want to generate catalogs for each image in the current
+directory without bothering about catalog names:
+
+	cl> wfpdcat *.fits names="default" maxob=1000 radius=30
+
+This example is based on the assumption that you are using the
+WFI@2p2.
+These catalogs can be used by the task wfpdzero in this way:
+
+	cl> wfpdzero *.fits header+ 
+
+2. You want another set of catalogs for the same images, but with a
+smaller radius.
+
+	cl> wfpdcat *.fits small1, small2, ..., small5 maxob=100
+radius=20
+
+if you want to use these catalogs, you will have to issue the command:
+
+	cl> wfpdzero *.fits header+
+
+if the headers are correct, or
+
+	cl> wfpdzero *.fits small1, small2, ... , small5 header-
+
+if you used wfpdcat for other purposes on the same images.
+.ih
+SEE ALSO
+wfpdzero
+.ih
+VERSION
+L.Rizzi, 1 Mar 2000.
+.endhelp

@@ -1,0 +1,130 @@
+procedure wfpcat2 (images, names)
+
+string		images		{prompt="Mosaic image for catalogue generation?"}
+file		names="default"	{prompt="Names of the catalogues?"}
+string		source="ucac2"  {prompt="Source catalogue ?", enum="ucac2|usno2|gsc2.2|2mass"}
+int		maxob=1000	{prompt="Maximum number of objects?"}
+real		radius=30	{prompt="Maximum search radius (arcmin)?"}
+string		unit="hours"		{prompt="RA unit ?", enum="deg|hours"}
+struct		*testo
+struct		*imglist
+struct		*catlist
+
+begin
+	file	 na, na_sort,fitscat
+	string	imgfile, im, catfile, str, id, uni,sou,cat_string,out_string,strdec
+	real	rah, dech, r, b, d, pa
+	int	max, nc, n
+	bool	check
+	real	rad, dec, ra
+
+	max = maxob
+	rad=radius
+        sou=source
+	catfile = mktemp("tmp$ctr")
+	imgfile = mktemp ("tmp$ctr")
+	na_sort = mktemp("tmp$sort")
+        fitscat = mktemp("cat")
+	uni=unit
+
+############### EXPAND IMAGE TEMPLATE and CATALOGUE LIST
+
+	sections (images, option="fullname", > imgfile)
+	section (names, option="fullname", > catfile)
+	imglist = imgfile
+	catlist = catfile
+	check=yes
+
+############### OPTIONS FOR CATALOG NAME GENERATION
+	while (fscan(imglist, im) !=EOF ) {
+		if (check==yes )
+		if(fscan(catlist, na)==EOF) break
+
+		if(na=="default" || check==no) {
+			na=im
+			check=no
+			nc=strlen(im)
+			if (nc>5 && substr(im, nc-4, nc) == ".fits")
+				na=substr (im,1,nc-5)
+			else if (nc >4 && substr (im, nc-3, nc) == ".imh")
+				na=substr (im,1, nc-4)
+			na=na//".cat"
+			}
+
+	print("************************")
+	print("*IMAGE= "//im)
+	print("************************")
+
+	hselect (im//"[0]", "RA", yes) | scan (ra)
+	hselect (im//"[0]", "DEC", yes) | scan (dec)	
+
+############### SEARCH CATALOG FOR STARS
+      	del(na, ve-,>>& "errors")
+	del("gowget", verify=no,>>& "errors")
+
+	if (uni=="hours") {ra=ra*15}
+
+
+        print(ra,dec)
+	if (sou=="ucac2") {
+            cat_string="I%2F289%2Fout&-out=2UCAC&2UCAC=&-out=RA%28ICRS%29&RA%28ICRS%29=&-out=DE%28ICRS%29&DE%28ICRS%29=&e_RAdeg=&e_DEdeg=&-out=UCmag&UCmag=&No=&Nc=&pmRA=&pmDE=&2Mkey=&Jmag=&Kmag=&-sort=UCmag"
+            out_string="2UCAC,RA(ICRS),DE(ICRS),UCmag"
+        }
+	if (sou=="usno2") {
+           cat_string="I%2F252%2Fout&-out=USNO-A2.0&USNO-A2.0=&-out=RA%28ICRS%29&RA%28ICRS%29=&-out=DE%28ICRS%29&DE%28ICRS%29=&ACTflag=&Mflag=&-out=Bmag&Bmag=&-sort=Bmag"
+           out_string="USNO-A2.0,RA(ICRS),DE(ICRS),Bmag"
+        }
+	if (sou=="gsc2.2") {
+           cat_string="I%2F271%2Fout&-out=GSC2.2&GSC2.2=&-out=RA%28ICRS%29&RA%28ICRS%29=&-out=DE%28ICRS%29&DE%28ICRS%29=&-out=Rmag&Rmag=&-out=Bjmag&Bjmag=%3C99&-sort=Bjmag"
+           #out_string="USNO-A2.0,RA(ICRS),DE(ICRS),Bmag"
+        }
+	if (sou=="2mass") {
+           cat_string="II%2F246%2Fout&-out=RAJ2000&RAJ2000=&-out=DEJ2000&DEJ2000=&-out=Kmag&Kmag="
+        }
+
+
+        if (dec >= 0) {
+                  strdec="%2B"
+                  printf ("wget -q -O %s \"http://vizier.u-strasbg.fr/viz-bin/asu-acl?-out.form=SkyCat-Compatible&-order=I&-c=%.6f%s%.6f&-c.eq=J2000&-out.max=%d&-oc.form=dec&-c.r=%.2f&-c.u=arcmin&-c.geom=r&-source=%s\"\n",fitscat,ra,strdec,dec,max,rad,cat_string,>'gowget')
+        }
+        
+
+        if (dec<0) {
+            printf ("wget -q -O %s \"http://vizier.u-strasbg.fr/viz-bin/asu-acl?-out.form=SkyCat-Compatible&-order=I&-c=%.6f+%.6f&-c.eq=J2000&-out.max=%d&-oc.form=dec&-c.r=%.2f&-c.u=arcmin&-c.geom=r&-source=%s\"\n",fitscat,ra,dec,max,rad,cat_string,>'gowget')
+        }
+	printf ("Searching %s catalogue. Coordinates: RA = %.2H DEC = %.2h.\n",sou,ra,dec)
+	print ("Please wait....")
+        
+        !source gowget
+
+	del("gowget", verify=no,>>& "errors")
+	print ("Done!")
+
+        ###### DELETE USELESS LINES
+	testo=fitscat
+#        print(fitscat,testo)
+#        page(fitscat)
+	str=""
+	while(fscan(testo, str) !=EOF) {
+		if (substr(str,1,5)=="-----") break
+                }
+	n=0
+	while(fscan(testo, id, rah, dech, b)!=EOF) {
+		n=n+1
+		if (id=="[EOD]") break
+		else printf("%s %15.10f %15.7f %5.1f \n", id, rah, dech, b,>> na)
+				}
+	n=n-1
+	print("The catalog contains "//n//" stars")	
+#	testo=""		
+
+	print("Now you have file -> "//na//".")
+	hedit(im//"[0]", "CATALOG", na, add+, del-, ver-, update+)
+	del(fitscat, ve-, >>&"errors")
+        
+	}
+        del("errors", ve-)
+
+end
+
+

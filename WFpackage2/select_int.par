@@ -1,0 +1,9 @@
+xdim,r,a,,,,X dimension
+ydim,r,a,,,,Y dimension
+infile,s,a,,,,Input file
+outfile,s,a,,,,Output file
+year,s,h,,,,YEAR
+month,s,h,,,,MONTH
+day,s,h,,,,DAY
+
+

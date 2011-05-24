@@ -1,0 +1,54 @@
+procedure wfphfix(images)
+
+file		images	{prompt="List of raw ESO MEF files ?"}
+bool		query	{prompt="Query for observation type ?"}
+bool		auto	{prompt="Automatically determines the right procedure from DATE-OBS?"}
+string		which   {prompt="Which esohdr (old or new) ?", enum="old|new"}
+file		wcsdb	{prompt="WCS database ?"}
+string		obstype {prompt="Observation type ?"}	
+bool		redo	{prompt="Redo ?"}
+struct		*fd1
+
+begin
+
+	file	imgfile, im, wcs
+	string	date,proc
+	int 	idx
+	bool	new, que, red, aut
+
+	imgfile=mktemp("tmp$img")
+	sections (images, option="fullname", > imgfile)
+	que=query	
+	red=redo
+	wcs=wcsdb
+	obs=obstype
+	aut=auto
+	
+	fd1 = imgfile
+	while(fscan(fd1, im)!=EOF) {
+	print("Now working on image..."//im)
+	if (aut) {
+	hselect(im//"[0]", "DATE-OBS", yes) | scan (date)
+	print(date)
+	idx=stridx("2", date)
+	if (idx==1) {
+		print("Observation after 1/1/2000: using new esohdr")
+		new=yes	
+		}
+	else {
+		print("Observation before 1/1/2000: using old esohdr")
+		new=no
+		}
+	}
+	else {
+		proc=which
+		if (proc=="new") {new=yes
+				print("Forcing new esohdr")}
+		else {new=no
+			print("Forcing old esohdr")}
+		}
+	newesohdr(input=im, queryty=que, namps=1, ntrans=1, 
+		wcsdb=wcs, redo=red, obstype=obs, new=new)
+
+	}
+end

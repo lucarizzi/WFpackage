@@ -1,0 +1,34 @@
+--- MODIFIED wrt Current Version 1.0:
+
+wfpdred.*
+
+wfpsetup.cl
+wfpsetwcs.cl
+wfpzero.cl
+wfpcenter.cl
+wfpastro.cl
+wfpcat2.cl
+wcsextract.cl (hidden)
+
+
+--- NEW tasks:
+
+wfpskysub.cl
+
+
+--- ../V2/:
+        108 Jun  4  2004 _wfpdred.hd
+         11 Mar  2  2006 wfpred.men -> wfpdred.men
+         10 Mar  2  2006 wfpred.hd -> wfpdred.hd
+       4195 Nov 22 14:18 wfpcat2.cl
+       1835 Nov 26 01:08 wfpskysub.cl
+       4017 Dec  6 01:46 wfpsetwcs.cl
+       5905 Dec  9 23:46 wfpsetup.cl
+      25551 Dec 11 01:05 wfpzero.cl
+       1144 Dec 11 09:32 wfpdred.men
+       2888 Dec 11 09:38 wfpdred.cl
+         11 Dec 11 09:55 _wfpred.hd -> _wfpdred.hd
+        262 Dec 11 10:13 wfpdred.hd
+       3181 Dec 11 23:27 wcsextract.cl
+       4402 Dec 12 00:01 wfpastro.cl
+       6346 Dec 14 23:23 wfpcenter.cl

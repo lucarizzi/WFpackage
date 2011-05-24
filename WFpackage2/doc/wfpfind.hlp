@@ -1,0 +1,52 @@
+.help wfpfind Mar2000 wfpdred
+.ih
+NAME
+wfpfind --- Find stars on mosaic images.
+.ih
+USAGE
+wfpfind image output
+.ih
+PARAMETERS
+.ls image
+Image to be searched for.
+.le
+.ls list
+Extensions to be searched for. You can specify either a single number
+or the word "all".
+.le
+.ls template
+Template for output generation. 
+.le
+.ls type
+Catalog format: either wcs or pixel coordinates.
+.le
+.ls seeing
+Seeing of input images (pixels)
+.le
+.ls thresh
+Finding threshold in sigma above the background.
+.le
+.ls instr
+As in wfdzero.
+.le
+
+.ih
+DESCRIPTION
+The task \fBwfpfind\fR is used as the standard IRAF daofind task to find
+stars on ccd images. The main difference is that the present task works on a
+mosaic image. The user can specify whether he/she wants to use the complete mosaic
+or only one ccd. The use of a list of ccd will be implemented in the future.
+To use the task, you need to specify the name of the image to be searched for and
+the number of the required ccd (or the keyword "all"). 
+The output catalog can be either in wcs or logical coordinates.
+The finding algorithm can be tuned by means of the seeing and the threshold parameters.
+
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+
+.ih
+VERSION
+L.Rizzi, 1 Mar 2000.
+.endhelp

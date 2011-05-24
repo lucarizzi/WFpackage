@@ -1,0 +1,11 @@
+27.05.2004
+MARCO G. copio wfpsetwcs.cl da dir WFPDRED_TEMP_LIC
+	 creato wfpsetwcs.cl_ORI   copia di backup 
+         perche' la versione che c'era qui era piu' vecchia e non 
+         andava con i mono-estensione
+
+3.6.2004
+EVH      copio qui files necessari per l'help; modifico wfpdred.men
+
+27.2.2006
+EVH,MG   corretto wfpcat2.cl per accedere direttamente a Vizier Strasbourg

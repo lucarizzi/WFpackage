@@ -1,0 +1,7 @@
+$doc	= "./doc/"
+wfpzero		hlp = doc$wfpzero.hlp,  src=wfpzero.cl
+wfpcat		hlp = doc$wfpcat.hlp, 	 src=wfpcat.cl
+wfpfind		hlp = doc$wfpfind.hlp, src=wfpfind.cl
+wfpcenter	hlp = doc$wfpcenter.hlp, src=wfpcenter.cl
+wfpskysub	hlp = doc$wfpcenter.hlp, src=wfpcenter.cl
+

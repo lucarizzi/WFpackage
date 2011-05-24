@@ -1,0 +1,6 @@
+wfpdred		men = wfpdred.men,
+		hlp = wfpdred.hlp,
+		sys = wfpdred.hlp,
+		pkg = wfpdred.hd,
+		src = wfpdred.cl
+

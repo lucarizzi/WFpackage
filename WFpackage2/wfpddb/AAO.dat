@@ -1,0 +1,21 @@
+extensions	8
+xdim		2142
+ydim		4128
+conv_def	2
+ron_def		4.5
+KEYWORDS CONVERSION:
+exptime		CEXPTIME
+convfact	NONE
+ron		NONE
+airmass		AIRMASS
+filter		FILTER
+units		e
+FILTER_NAME CONVERSION:
+V/89	"V #50 (WFI Schott)"
+B/99	"B #49 (WFI Schott)"
+U/38	"U #48 (WFI Schott)"	
+Ic/lwp	I
+Rc/162  R
+AXES ORIENTATION
+x -1
+y 1

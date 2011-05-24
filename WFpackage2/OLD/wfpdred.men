@@ -1,0 +1,26 @@
+
+                                  PACKAGE SETUP 
+
+        wfpsetup  - Package setup for available instruments (no help yet)
+        wfpsetwcs - Write astrometry keywords in MEF images (no help yet)
+
+                                  BASIC TASKS
+
+	wfpzero   - Determine offset between image and astrometric calib.list
+        wfpcat    - Get astrometric catalog via network 
+        wfpcat2   - Get astrometric catalog (new version, no help yet) 
+        wfpfind   - Search objects in MEF image 
+        wfpcent   - Recenter object catalog in MEF file
+
+                                  CALIBRATION AND COADDING
+
+        wfpphot   - Photometry of standard stars on MEF images (no help yet)
+        wfpfit    - Fit measurements of standard stars (no help yet)
+        wfpnorm   - Adjust response and background of CCDs in MEF (no help yet)
+        wfpcomb   - Rebin and combine MEF images (no help yet)
+
+                                  DEVELOPMENT COMMANDS
+
+        wfptnxsol - Write astrometry database in MEF images (no help yet)
+        wfpastro  - Build new astrometric solution for MEF (no help yet)        
+

@@ -1,0 +1,22 @@
+extensions 1
+xdim 	2048
+ydim	2048
+conv_def	1.61
+ron_def		3.2
+KEYWORDS CONVERSION
+exptime		EXPTIME
+convfact	NONE
+ron		NONE
+airmass		AIRMASS
+filter		FILTER1
+units		e
+FILTER_NAME CONVERSION:
+U_BESS	U		
+B_BESS	B
+V_BESS	V
+R_BESS	R
+I_BESS	I
+AXES ORIENTATION
+x 1
+y -1
+

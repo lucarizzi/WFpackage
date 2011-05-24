@@ -1,0 +1,155 @@
+
+procedure wfpmask (images)
+
+string images    {prompt="List of images to be masked"}
+string point     {"circle", prompt="Mark type"}
+int    msize     {1, prompt="Mark size"}
+int    mcolor    {204, prompt="Mark color: 202=black, 203=white, ..."}
+real   xoff      {0., prompt="X offset for output file"}
+real   yoff      {0., prompt="Y offset for output file"}
+real   scale     {1., prompt="Relative image scale"}
+
+struct	*flist, *extlist
+
+begin
+
+   file		errors
+   string       imatempl, tmpfile, pref, name, outname, rootname, imext
+   int		iplane, mc, wcs, ms, n, i, j, n_ext
+   bool		start, noext
+   string	mark, mfile, pfile, ufile
+   struct 	command, line
+   real	x, y, xo, yo, sca, xcen, ycen, rad
+
+   imatempl = images     # copy the template (so far, a string)
+   errors = 'errors.log'
+   iplane = 1
+   mark = point
+   ms = msize
+   mc = mcolor
+   xo = xoff
+   yo = yoff
+   sca = scale
+   n = 0
+   noext = no
+   ufile = "tmp.reg"
+
+   # Make sure that the images and tv packages are loaded
+
+   if (! defpac ("mscred")) {
+      print ("Load MSCRED package and try again")
+      bye
+   }
+
+   if (! defpac ("proto")) {
+      print ("Load noao.proto package and try again")
+      bye
+   }
+
+	if (! defpac ("tv")) {
+      print ("Load images.tv package and try again")
+	   bye
+   }
+
+    del("tmp_0*", ve-, >>& errors)
+    del("tmp_*.pl", ve-, >>& errors)
+
+# expand the template string into a temporary file:
+    tmpfile = mktemp ("tmp$tmp")
+    sections (imatempl, opt="full", > tmpfile)  
+
+    flist = tmpfile
+    while (fscan (flist, name) != EOF) {
+
+      #-- create output name 
+      i = strlen(name)
+      if (substr(name, i-4, i) == ".fits")  { 
+		rootname = substr(name,1,i-5) 
+	} else {
+		rootname = name
+	}
+
+	imextensions(name, output="none", index="1-", extname="", extver="")
+	n_ext=imextensions.nimages 		
+	print("IMAGE "//name//" contains "//n_ext//" extensions ...")
+
+#- account for non-MEF images:
+	if (n_ext==0) {
+		noext=yes
+		n_ext=1
+		}
+
+#- perform visual masking for each extension:
+	for (j=1; j<=n_ext; j+=1) {
+		if (noext) i=0 
+		else i=j
+
+		imext = name//"["//i//"]"
+		print ("... ready for masking of ",imext)
+
+		if (access(ufile)) delete (ufile, ver-)
+		pfile = "tmp_"//i
+
+      #-- display image
+		display (imext, iplane)
+		n = 0
+		mfile = mktemp ("tmp$mf")
+
+ loop:
+      print ("Mark object center -- <ctrl/D> to escape")
+      if (fscan (imcur, x, y, wcs, command) != EOF) {
+        xcen = x
+        ycen = y
+        print (x, y, imext, > mfile)
+      } else {
+        goto abort
+      }
+
+      print ("... now mark object radius")
+      if (fscan (imcur, x, y, wcs, command) != EOF) {
+        rad = sqrt ( (x-xcen)**2 + (y-ycen)**2 ) 
+        ms = rad 
+        tvmark (iplane, mfile, int=no, label=no, mark=mark, color=mc, radii=ms, pointsize=ms, txsize=ms, logfile="", outimage="")
+        delete (mfile, ver-)
+      }
+
+      n = n + 1
+      x = (xcen - .5)/sca + xo + .5
+      y = (ycen - .5)/sca + yo + .5
+      print ("circle (", x, ",", y, ",", rad, "]") | scan(line)
+      line = substr (line, 1, stridx("]",line)-1) + ")"
+      print (line, >> ufile)
+      goto loop
+
+  abort:
+
+      beep
+      if (access(pfile//".pl")) delete (pfile//".pl")
+      if (access(pfile//".fits")) delete (pfile//".fits")
+      print ("... overwriting mask: ", pfile)
+      #- obsolete:  zappa (ofile, pfile, name)
+#- create empty mask of the correct size:
+	mskexpr (expr="(i == 0) ? 0 : 0", masks=pfile, refima=imext) 
+#- mask one or more regions:
+      if (access(ufile)) { 
+	  mskregions (region=ufile, mask=pfile, refima="",  append+)
+	}
+###	imcopy (pfile//".pl", pfile//"[type=mask]", verb+)
+
+ 	} #-- END FOR
+#- join masks:
+	# BUILD EXTENSION 0
+	if (noext) {
+		imcopy ("tmp_0.pl", "MSK"//rootname, ve-)
+	} else {
+		imcopy ("tmp_1.pl", "tmp_0[type=mask]", ve-)
+		mscjoin (input="tmp",output="MSK"//name, ve+, del-)
+	}
+
+
+    }#- END_IMAGE_LOOP
+
+    delete (tmpfile, ver-)
+    flist = ""
+
+end

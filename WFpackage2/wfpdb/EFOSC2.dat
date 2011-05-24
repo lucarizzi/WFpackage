@@ -1,0 +1,18 @@
+extensions	1
+xdim		2060
+ydim		2060
+conv_def	0.48
+ron_def		9.00 
+KEYWORDS CONVERSION:
+exptime		EXPTIME
+convfact	NONE 
+ron		NONE  
+airmass		NONE
+filter		NONE
+units		e         (ADU or e)
+FILTER_NAME CONVERSION:  WRONG!!!!!!!!!!!!!!!!!!
+V/89	V
+B/99	B
+U/38	U
+Ic/lwp	I
+Rc/162  R

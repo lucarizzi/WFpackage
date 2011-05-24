@@ -1,0 +1,169 @@
+procedure wfprefsol(images)
+
+string	images		{prompt="Images to work on ?"}
+string	solution	{prompt="File with the astrometric solution ?"}
+bool	subsets=yes	{prompt="Use only images with correct subset?"}
+string	subimage	{prompt="Image containing the correct subset (reference) ?"}
+bool	add=yes		{prompt="Add and center new solution?"}
+bool	onecat=no	{prompt="Use only one reference catalog (no with std fields)?"}
+struct	*fd1, *fd2
+
+begin
+
+	string 	sol, subima, filter, img, filt_now
+	file	imgfile, errors, refcat
+	string	na
+	bool	subs, addsol, one
+	string	old_lngref, old_latref, new_lngref, new_latref
+	real	ra,dec
+	int 	nc
+	
+	string  str1, str2
+
+	errors=mktemp("tmp$errors")
+	addsol=add
+	one=onecat
+	#### Check the subset paramater
+
+	subs=subsets
+	if (subs) {subima=subimage}
+	
+	sol=solution
+	
+	#### Expand the image list
+
+	imgfile=mktemp("tmp$images")
+	sections (images, option="fullname", > imgfile)
+	
+
+	#### DETERMINE the current ra and dec from the database file
+	fd2=sol
+	while(fscan(fd2, str1,str2)!=EOF) {
+		if (str1=="lngref") 	old_lngref=str2
+		if (str1=="latref") {
+				    	old_latref=str2
+				    	break
+			}
+		}
+
+
+	#### IF REQUIRED, load the correct subset (filter)
+	
+	if (subs) {
+		hselect(subima//"[0]", "FILTNAME", yes) | scan(filter)
+		}	
+
+	### operations to be performed for each image
+	fd1=imgfile
+	while(fscan(fd1,img)!=EOF) {
+		if (subs) {
+		hselect(img//"[0]", "FILTNAME", yes) | scan(filt_now)
+		if (filt_now!=filter) {
+			print("Image "//img//" rejected: "//filt_now//" is not "//filter)
+			next
+			}
+		}
+		print("Building astrometric solution for image:"//img)
+		hselect(img//"[0]", "RA,DEC", yes) | scan(ra,dec)
+
+		if (ra==dec) {
+		hselect(img//"[0]", "RA,DEC", yes) | scan (ra,ra,dec,dec)
+		}
+		ra=ra*15
+		
+	### REMOVE the .fits or .imh from the image name
+		na=img
+		nc=strlen(img)
+		if (nc>5 && substr(img, nc-4, nc) == ".fits")
+		na=substr (img,1,nc-5)
+		else if (nc >4 && substr (img, nc-3, nc) == ".imh")
+		na=substr (img,1, nc-4)
+		na=na//".sol"				
+	
+	### REPLACE the old ra and dec whit the new values
+
+		new_lngref=str(ra)
+		new_latref=str(dec)
+		del(na, ve-, >>&errors)
+		del ("x.sh", ve-, >>&errors)
+		del ("tmp1", ve-, >>&errors)
+		print("OLD  RA: "//old_lngref//" NEW  RA: "//new_lngref)
+		print("OLD DEC: "//old_latref//" NEW DEC: "//new_latref)
+
+		print("sed 's/"//old_lngref//"/"//new_lngref//"/g' "//sol//" >> tmp1", >>"x.sh")
+		!sh x.sh
+		del("x.sh", ve-, >>&errors)
+		print("sed 's/"//old_latref//"/"//new_latref//"/g' tmp1 >>"//na, >>"x.sh")
+		!sh x.sh
+		del ("tmp1",   ve-)
+		del ("x.sh", ve-)
+
+	}
+	
+	### IF REQUIRED, PERFORM CENTERING OF THE SOLUTION, LAST STEP BEFORE COMBINING
+	### OR BEFORE PERFORMING THE PIXAREA CORRECTION
+
+	### FIRST: CENTER THE NEW SOLUTION ON THE REFERENCE IMAGE AND CREATE THE REFERENCE CATALOG
+		### REMOVE the .fits or .imh from the image name
+		 na=subima
+		 nc=strlen(subima)
+		 if (nc>5 && substr(subima, nc-4, nc) == ".fits")
+			na=substr (subima,1,nc-5)
+		 else if (nc >4 && substr (subima, nc-3, nc) == ".imh")
+		 na=substr (subima,1, nc-4)
+
+  		 hedit(subima//"[0]",  "RA_OFFS", del+, upd+, ve-)
+		 hedit(subima//"[0]", "DEC_OFFS", del+, upd+, ve-)		
+		 wfpsetwcs(subima,na//".sol",wcssol+,ra="ra", dec="dec", ra_offs=0, dec_offs=0)
+		 
+		### PERFORM REGISTERING OF THE SOLUTION
+		 wfpzero(subima, names="", header+, fields="3,4,5", units="deg", mod1="auto", appl+,ref+,
+			 maxshift=4, instr="wfi@2p2", wcs=na//".sol")
+		 wfpzero(subima, names="", header+, fields="3,4,5", units="deg", mod1="ref", appl+,ref+,
+			 maxshift=1, instr="wfi@2p2", wcs=na//".sol")
+		### CENTER CATALOG USING THE NEW SOLUTION:
+		if(one) { wfpcenter(image=subima, inname=na//".cat",outname=na//".center.cat", colum="3,4", colmag="5",
+			inunits="deg", outunits="deg", astro-) }
+		
+	### SECOND: WITH THE NEW CATALOG, CENTER EACH SOLUTION (ALSO THE REFERENCE IMAGE? yes)
+	if (one) refcat=na//".center.cat"
+	fd1=imgfile
+	while(fscan(fd1,img)!=EOF) {
+		if (subs) {
+		hselect(img//"[0]", "FILTNAME", yes) | scan(filt_now)
+		if (filt_now!=filter) {
+			print("Image "//img//" rejected: "//filt_now//" is not "//filter)
+			next
+			}
+		}
+		### REMOVE the .fits or .imh from the image name
+		 na=img
+		 nc=strlen(img)
+		 if (nc>5 && substr(img, nc-4, nc) == ".fits")
+			na=substr (img,1,nc-5)
+		 else if (nc >4 && substr (img, nc-3, nc) == ".imh")
+		 na=substr (img,1, nc-4)
+		 
+	 	### PERFORM REGISTERING OF THE SOLUTION
+  		 hedit(img//"[0]",  "RA_OFFS", del+, upd+, ve-)
+		 hedit(img//"[0]", "DEC_OFFS", del+, upd+, ve-)		
+		 wfpsetwcs(img,na//".sol",wcssol+,ra="ra", dec="dec", ra_offs=0, dec_offs=0)
+	
+		 if (one) { wfpzero(img, names=refcat, header-, fields="1,2,3", units="deg", mod1="auto", appl+,ref+,
+			     maxshift=10, instr="wfi@2p2", wcs=na//".sol")
+		            wfpzero(img, names=refcat, header-, fields="1,2,3", units="deg", mod1="ref", appl+,ref+,
+			     maxshift=4, instr="wfi@2p2", wcs=na//".sol") }
+		 else {	    wfpzero(img, names="", header+, fields="3,4,5", units="deg", mod1="auto", appl+,ref+,
+			     maxshift=10, instr="wfi@2p2", wcs=na//".sol")
+			    wfpzero(img, names="", header+, fields="3,4,5", units="deg", mod1="ref", appl+,ref+,
+			     maxshift=4, instr="wfi@2p2", wcs=na//".sol")	
+                         }
+		}
+	
+end
+
+
+
+
+
+

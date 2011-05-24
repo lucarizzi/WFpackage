@@ -1,0 +1,4 @@
+host,s,a,,,,Host name
+year,s,h,,,,YEAR
+month,s,h,,,,MONTH
+day,s,h,,,,DAY

@@ -1,0 +1,5 @@
+xdim,r,a,,,,X dimension
+ydim,r,a,,,,Y dimension
+infile,s,a,,,,Input file
+outfile,s,a,,,,Output file
+

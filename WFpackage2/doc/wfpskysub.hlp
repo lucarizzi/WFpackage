@@ -1,0 +1,34 @@
+.help wfpskysub Dec2007 wfpdred
+.ih
+NAME
+wfpskysub -- Subtract sky background from MEF file with object masking
+.ih
+USAGE
+wfpskysub image output
+.ih
+PARAMETERS
+.ls image
+Image to be background subtracted.
+.le
+.ls output
+Sky-subtracted output image.
+.le
+
+.ih
+DESCRIPTION
+The task \fBwfpskysub\fR implements both \fBobjmasks\fR and
+\fBmscskysub\fR (\fBimsurfit\fR with masking) for multi-extension
+images. Either the median images produced by "objmasks" or a fitted
+polynomial surface can be subtracted from each CCD.
+See help pages of \fBimsurfit\fR and \fBobjmasks\fR for details. 
+
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+imsurfit, objmasks
+
+.ih
+VERSION
+E. V. Held, Dec. 2007
+.endhelp

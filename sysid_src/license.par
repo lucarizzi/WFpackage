@@ -1,0 +1,5 @@
+user,s,a,,,,User name
+machine,s,a,,,,Machine name
+year,r,a,,,,Expiration year
+month,r,a,,,,Expiration month (two digit!)
+day,r,a,,,,Expiration day

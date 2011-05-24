@@ -1,0 +1,5 @@
+wfpdred		men = wfpddir$wfpdred.men,
+		hlp = wfpddir$wfpdred.hlp,
+		sys = wfpddir$wfpdred.hlp,
+		pkg = wfpddir$wfpdred.hd,
+		src = wfpddir$wfpdred.cl

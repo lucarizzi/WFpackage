@@ -1,0 +1,18 @@
+extensions	1
+xdim		2100
+ydim		2100
+conv_def	0.97
+ron_def		9.00 
+KEYWORDS CONVERSION:
+exptime		EXPTIME
+convfact	GAIN_1 
+ron		RON_1  
+airmass		AIRMASS
+filter		FLT_ID
+units		ADU         (ADU or e)
+FILTER_NAME CONVERSION:  WRONG!!!!!!!!!!!!!!!!!!
+V/89	V
+B/99	B
+U/38	U
+Ic/lwp	I
+Rc/162  R
